@@ -1,0 +1,28 @@
+{
+  "name": "webworker-architecture",
+  "version": "0.0.1",
+  "description": "An example architecture using web workers",
+  "scripts": {
+    "dev": "node_modules/.bin/webpack-dev-server --content-base docs --watch-content-base --inline",
+    "prod": "cross-env NODE_ENV=production node_modules/.bin/webpack"
+  },
+  "author": "Vincent Kammerer <vkammerer@gmail.com> (http://vincent-kammerer.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "@cycle/run": "^3.1.0",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.0.0",
+    "firebase": "^3.9.0",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "redux-cycles": "^0.4.0",
+    "webpack": "^2.5.1",
+    "webpack-dev-server": "^2.4.5"
+  }
+}
