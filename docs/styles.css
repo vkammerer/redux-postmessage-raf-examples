@@ -42,3 +42,12 @@ ul {
   background: #EEE;
   border: 1px solid #DDD;
 }
+
+.perfData {
+  border-left: 1px solid #CCC;
+}
+
+.perfD {
+  height: 2px;
+  background: blue;
+}

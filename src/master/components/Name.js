@@ -6,16 +6,16 @@ const getNameAction = {
   meta: { toWorker: true }
 };
 
-const Header = prop => (
+const Header = props => (
   <div>
     <h3>Name</h3>
     <p>
       Get the name from the cyclejs application in the worker.
     </p>
-    <button onClick={() => prop.dispatch(getNameAction)}>
+    <button onClick={() => props.dispatch(getNameAction)}>
       Get name
     </button>
-    <p className="output">{prop.name}</p>
+    <p className="output">{props.name}</p>
   </div>
 );
 

@@ -5,6 +5,7 @@ import { perfData } from "../common/perf";
 
 const defaultState = {
   ticker: "stopped",
+  perfData: [],
   perfMean: "-",
   perfMin: "-",
   perfMax: "-",
@@ -18,6 +19,7 @@ const getPerfMetrics = () => {
   const perfMin = Math.min(...perfData);
   const perfMax = Math.max(...perfData);
   return {
+    perfData,
     perfMean,
     perfMin,
     perfMax

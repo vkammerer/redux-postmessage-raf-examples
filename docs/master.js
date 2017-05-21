@@ -10951,6 +10951,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var defaultState = {
   ticker: "stopped",
+  perfData: [],
   perfMean: "-",
   perfMin: "-",
   perfMax: "-",
@@ -10966,6 +10967,7 @@ var getPerfMetrics = function getPerfMetrics() {
   var perfMin = Math.min.apply(Math, _toConsumableArray(_perf.perfData));
   var perfMax = Math.max.apply(Math, _toConsumableArray(_perf.perfData));
   return {
+    perfData: _perf.perfData,
     perfMean: perfMean,
     perfMin: perfMin,
     perfMax: perfMax
@@ -11114,7 +11116,7 @@ var getNameAction = {
   meta: { toWorker: true }
 };
 
-var Header = function Header(prop) {
+var Header = function Header(props) {
   return _react2.default.createElement(
     "div",
     null,
@@ -11131,14 +11133,14 @@ var Header = function Header(prop) {
     _react2.default.createElement(
       "button",
       { onClick: function onClick() {
-          return prop.dispatch(getNameAction);
+          return props.dispatch(getNameAction);
         } },
       "Get name"
     ),
     _react2.default.createElement(
       "p",
       { className: "output" },
-      prop.name
+      props.name
     )
   );
 };
@@ -11171,7 +11173,7 @@ var toggleTickerAction = {
   meta: { toWorker: true }
 };
 
-var Ticker = function Ticker(prop) {
+var Ticker = function Ticker(props) {
   return _react2.default.createElement(
     "div",
     null,
@@ -11188,12 +11190,12 @@ var Ticker = function Ticker(prop) {
     _react2.default.createElement(
       "button",
       {
-        className: prop.ticker === "started" ? "active" : "",
+        className: props.ticker === "started" ? "active" : "",
         onClick: function onClick() {
-          return prop.dispatch(toggleTickerAction);
+          return props.dispatch(toggleTickerAction);
         }
       },
-      prop.ticker === "stopped" ? "Start ticker" : "Stop ticker"
+      props.ticker === "stopped" ? "Start ticker" : "Stop ticker"
     ),
     _react2.default.createElement(
       "p",
@@ -11211,7 +11213,7 @@ var Ticker = function Ticker(prop) {
       _react2.default.createElement(
         "div",
         null,
-        prop.perfMean
+        props.perfMean
       ),
       _react2.default.createElement(
         "strong",
@@ -11221,7 +11223,7 @@ var Ticker = function Ticker(prop) {
       _react2.default.createElement(
         "div",
         null,
-        prop.perfMin
+        props.perfMin
       ),
       _react2.default.createElement(
         "strong",
@@ -11231,8 +11233,18 @@ var Ticker = function Ticker(prop) {
       _react2.default.createElement(
         "div",
         null,
-        prop.perfMax
+        props.perfMax
       )
+    ),
+    _react2.default.createElement(
+      "div",
+      { className: "perfData" },
+      props.perfData.map(function (perfD) {
+        return _react2.default.createElement("div", {
+          className: "perfD",
+          style: { width: perfD / props.perfMax * 100 + "%" }
+        });
+      })
     )
   );
 };
