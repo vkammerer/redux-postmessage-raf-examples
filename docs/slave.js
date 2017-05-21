@@ -4560,8 +4560,8 @@ var Ticker = function () {
     key: "tick",
     value: function tick() {
       if (!this.shouldTick) return;
-      requestAnimationFrame(this.tick);
       this.fn(this.count);
+      requestAnimationFrame(this.tick);
       this.count++;
     }
   }]);
