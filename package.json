@@ -4,7 +4,7 @@
   "description": "An example architecture using web workers",
   "scripts": {
     "dev": "node_modules/.bin/webpack-dev-server --content-base docs --watch-content-base --inline",
-    "prod": "cross-env NODE_ENV=production node_modules/.bin/webpack"
+    "prod": "node_modules/.bin/webpack --define process.env.NODE_ENV=\"'production'\" --optimize-minimize"
   },
   "author": "Vincent Kammerer <vkammerer@gmail.com> (http://vincent-kammerer.com)",
   "license": "MIT",
@@ -15,7 +15,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-env": "^1.4.0",
     "babel-preset-react": "^6.24.1",
-    "cross-env": "^5.0.0",
     "firebase": "^3.9.0",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
