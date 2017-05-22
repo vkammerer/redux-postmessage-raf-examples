@@ -18,13 +18,13 @@ export const listenToMainActions = store => {
   });
 };
 
-const handleFromWorkerAction = ({ logger, ticker, action, thisTicker }) => {
+const handleFromWorkerAction = ({ logger, action, ticker }) => {
   if (logger) console.log("ACTION FROM WORKER", performance.now(), action);
-  if (ticker && action.type === "TICKER_START") {
+  if (action.type === "TICKER_START") {
     perfData.length = 0;
-    thisTicker.start();
+    ticker.start();
   }
-  if (ticker && action.type === "TICKER_STOP") thisTicker.stop();
+  if (action.type === "TICKER_STOP") ticker.stop();
   if (action.type === "TICKER_PONG") {
     perfData.push(performance.now() - action.payload.time);
   }
@@ -40,12 +40,10 @@ const sendPingToWorker = (sendToThisWorker, logger) => tick => {
   sendToThisWorker(pingAction);
 };
 
-export const createWorkerMiddleware = ({ worker, logger, ticker }) => store => {
+export const createWorkerMiddleware = ({ worker, logger }) => store => {
   listenToWorkerActions({ worker, store });
   const sendToThisWorker = sendToWorker(worker);
-  const thisTicker = !ticker
-    ? null
-    : new Ticker(sendPingToWorker(sendToThisWorker, logger));
+  const ticker = new Ticker(sendPingToWorker(sendToThisWorker, logger));
   return next => action => {
     if (!action) return console.log("NO ACTION");
     if (action.meta && action.meta.toWorker) {
@@ -53,7 +51,7 @@ export const createWorkerMiddleware = ({ worker, logger, ticker }) => store => {
       return sendToThisWorker(action);
     }
     if (action.meta && action.meta.toMain) {
-      handleFromWorkerAction({ store, logger, ticker, action, thisTicker });
+      handleFromWorkerAction({ logger, action, ticker });
       return next(action);
     }
     if (logger) console.log("ACTION WITHOUT DIRECTION", action);

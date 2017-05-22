@@ -64,8 +64,7 @@ const reducer = (state = defaultState, action) => {
 
 const slaveWorkerMiddleware = createWorkerMiddleware({
   worker: slaveWorker,
-  logger: false,
-  ticker: true
+  logger: false
 });
 
 export const store = createStore(
