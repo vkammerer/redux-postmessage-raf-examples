@@ -11208,13 +11208,21 @@ var Ticker = function Ticker(props) {
       props.ticker === "stopped" ? "Start ticker" : "Stop ticker"
     ),
     _react2.default.createElement(
-      "p",
-      null,
-      "Roundtrip time in ms:"
+      "div",
+      { className: "animation" },
+      _react2.default.createElement("div", {
+        className: "animated",
+        style: { transform: "scale(" + props.tick % 200 / 200 + ")" }
+      })
     ),
     _react2.default.createElement(
       "div",
       { className: "output" },
+      _react2.default.createElement(
+        "p",
+        null,
+        "Roundtrip time in ms:"
+      ),
       _react2.default.createElement(
         "strong",
         null,
@@ -11248,16 +11256,8 @@ var Ticker = function Ticker(props) {
     ),
     _react2.default.createElement(
       "div",
-      { className: "animation" },
-      _react2.default.createElement("div", {
-        className: "animated",
-        style: { transform: "scaleY(" + props.tick % 200 / 200 + ")" }
-      })
-    ),
-    _react2.default.createElement(
-      "div",
       { className: "perfData" },
-      props.perfData.map(function (perfD, index) {
+      props.ticker === "stopped" && props.perfData.map(function (perfD, index) {
         return _react2.default.createElement("div", {
           key: index,
           className: "perfD",

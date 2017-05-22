@@ -18,10 +18,16 @@ const Ticker = props => (
     >
       {props.ticker === "stopped" ? "Start ticker" : "Stop ticker"}
     </button>
-    <p>
-      Roundtrip time in ms:
-    </p>
+    <div className="animation">
+      <div
+        className="animated"
+        style={{ transform: `scale(${props.tick % 200 / 200})` }}
+      />
+    </div>
     <div className="output">
+      <p>
+        Roundtrip time in ms:
+      </p>
       <strong>Mean:</strong>
       <div>{props.perfMean}</div>
       <strong>Min:</strong>
@@ -29,20 +35,15 @@ const Ticker = props => (
       <strong>Max:</strong>
       <div>{props.perfMax}</div>
     </div>
-    <div className="animation">
-      <div
-        className="animated"
-        style={{ transform: `scaleY(${props.tick % 200 / 200})` }}
-      />
-    </div>
     <div className="perfData">
-      {props.perfData.map((perfD, index) => (
-        <div
-          key={index}
-          className="perfD"
-          style={{ width: `${perfD / Math.max(...props.perfData) * 100}%` }}
-        />
-      ))}
+      {props.ticker === "stopped" &&
+        props.perfData.map((perfD, index) => (
+          <div
+            key={index}
+            className="perfD"
+            style={{ width: `${perfD / Math.max(...props.perfData) * 100}%` }}
+          />
+        ))}
     </div>
   </div>
 );

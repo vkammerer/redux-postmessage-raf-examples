@@ -28,6 +28,9 @@ button {
   border: 1px solid #6995c3;
   border-radius: 3px;
 }
+button:focus {
+  outline:0;
+}
 button.active {
   background: #ffb1b1;
   border: 1px solid #c36969;
@@ -36,24 +39,28 @@ ul {
   list-style-type: none;
 }
 
+.animation {
+  margin-bottom: 10px;
+  position: relative;
+  background: black;
+  height: 200px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.animated {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: red;
+  height: 100%;
+  transform: scale(0);
+}
+
 .output {
-  margin-top: 10px;
+  margin-bottom: 10px;
   padding: 10px;
   background: #EEE;
   border: 1px solid #DDD;
-}
-
-.animation {
-  background: black;
-  height: 200px;
-  margin-bottom: 10px; 
-}
-.animated {
-  position: relative;
-  background: red;
-  height: 100%;
-  transform: scaleY(0.1);
-  transform-origin: center 0;
 }
 
 .perfData {
@@ -61,6 +68,6 @@ ul {
 }
 
 .perfD {
-  height: 2px;
+  height: 1px;
   background: blue;
 }
