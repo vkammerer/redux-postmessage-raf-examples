@@ -29,11 +29,18 @@ const Ticker = props => (
       <strong>Max:</strong>
       <div>{props.perfMax}</div>
     </div>
+    <div className="animation">
+      <div
+        className="animated"
+        style={{ transform: `scaleY(${props.tick % 200 / 200})` }}
+      />
+    </div>
     <div className="perfData">
-      {props.perfData.map(perfD => (
+      {props.perfData.map((perfD, index) => (
         <div
+          key={index}
           className="perfD"
-          style={{ width: `${perfD / props.perfMax * 100}%` }}
+          style={{ width: `${perfD / Math.max(...props.perfData) * 100}%` }}
         />
       ))}
     </div>

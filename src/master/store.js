@@ -4,6 +4,7 @@ import { slaveWorker } from "./slaveWorker";
 import { perfData } from "../common/perf";
 
 const defaultState = {
+  tick: 0,
   ticker: "stopped",
   perfData: [],
   perfMean: "-",
@@ -39,6 +40,13 @@ const reducer = (state = defaultState, action) => {
         ticker: "stopped",
         ...getPerfMetrics()
       };
+    case "TICKER_PONG": {
+      return {
+        ...state,
+        tick: action.payload.tick
+      };
+    }
+
     case "NAME_SET":
       return {
         ...state,

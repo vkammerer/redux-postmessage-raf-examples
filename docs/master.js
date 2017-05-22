@@ -10950,6 +10950,7 @@ var _perf = __webpack_require__(33);
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var defaultState = {
+  tick: 0,
   ticker: "stopped",
   perfData: [],
   perfMean: "-",
@@ -10987,6 +10988,13 @@ var reducer = function reducer() {
       return Object.assign({}, state, {
         ticker: "stopped"
       }, getPerfMetrics());
+    case "TICKER_PONG":
+      {
+        return Object.assign({}, state, {
+          tick: action.payload.tick
+        });
+      }
+
     case "NAME_SET":
       return Object.assign({}, state, {
         name: action.payload.name
@@ -11168,6 +11176,8 @@ var _reactRedux = __webpack_require__(32);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var toggleTickerAction = {
   type: "TICKER_TOGGLE",
   meta: { toWorker: true }
@@ -11238,11 +11248,20 @@ var Ticker = function Ticker(props) {
     ),
     _react2.default.createElement(
       "div",
+      { className: "animation" },
+      _react2.default.createElement("div", {
+        className: "animated",
+        style: { transform: "scaleY(" + props.tick % 200 / 200 + ")" }
+      })
+    ),
+    _react2.default.createElement(
+      "div",
       { className: "perfData" },
-      props.perfData.map(function (perfD) {
+      props.perfData.map(function (perfD, index) {
         return _react2.default.createElement("div", {
+          key: index,
           className: "perfD",
-          style: { width: perfD / props.perfMax * 100 + "%" }
+          style: { width: perfD / Math.max.apply(Math, _toConsumableArray(props.perfData)) * 100 + "%" }
         });
       })
     )

@@ -43,6 +43,19 @@ ul {
   border: 1px solid #DDD;
 }
 
+.animation {
+  background: black;
+  height: 200px;
+  margin-bottom: 10px; 
+}
+.animated {
+  position: relative;
+  background: red;
+  height: 100%;
+  transform: scaleY(0.1);
+  transform-origin: center 0;
+}
+
 .perfData {
   border-left: 1px solid #CCC;
 }
