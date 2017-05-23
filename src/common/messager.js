@@ -34,7 +34,6 @@ class Messager {
     this.ticking = false;
   }
   tick() {
-    if (this.ticking) requestAnimationFrame(this.tick);
     this.pushAction({
       type: "TICKER_PING",
       payload: {
@@ -44,6 +43,7 @@ class Messager {
       meta: { toWorker: true }
     });
     this.sendActions();
+    if (this.ticking) requestAnimationFrame(this.tick);
     this.count++;
   }
 }
