@@ -1,7 +1,6 @@
 import { createStore, applyMiddleware } from "redux";
 import { createWorkerMiddleware } from "../common/redux-worker";
 import { slaveWorker } from "./slaveWorker";
-import { perfData } from "../common/perf";
 
 const defaultState = {
   tick: 0,
@@ -14,19 +13,6 @@ const defaultState = {
   articles: []
 };
 
-const getPerfMetrics = () => {
-  const perfTotal = perfData.reduce((m1, m2) => m1 + m2, 0);
-  const perfMean = perfTotal / perfData.length;
-  const perfMin = Math.min(...perfData);
-  const perfMax = Math.max(...perfData);
-  return {
-    perfData,
-    perfMean,
-    perfMin,
-    perfMax
-  };
-};
-
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
     case "TICKER_START":
@@ -37,8 +23,7 @@ const reducer = (state = defaultState, action) => {
     case "TICKER_STOP":
       return {
         ...state,
-        ticker: "stopped",
-        ...getPerfMetrics()
+        ticker: "stopped"
       };
     case "TICKER_PONG": {
       return {

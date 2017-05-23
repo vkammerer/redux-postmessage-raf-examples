@@ -1,6 +1,6 @@
-import Ticker from "./ticker";
+import Messager from "./messager";
 import { sendToWorker, sendToMain } from "./worker";
-import { perfData } from "./perf";
+import { addToPerf, resetPerf } from "./perf";
 
 export const listenToWorkerActions = ({ worker, store }) => {
   worker.addEventListener("message", mE => {
@@ -12,63 +12,51 @@ export const listenToWorkerActions = ({ worker, store }) => {
 
 export const listenToMainActions = store => {
   self.addEventListener("message", mE => {
-    const action = JSON.parse(mE.data);
-    if (!action || !action.type) return;
-    return store.dispatch(action);
+    const message = JSON.parse(mE.data);
+    if (message.actions)
+      message.actions.forEach(action => {
+        store.dispatch(action);
+      });
   });
 };
 
-const handleFromWorkerAction = ({ logger, action, ticker }) => {
-  if (logger) console.log("ACTION FROM WORKER", performance.now(), action);
+const handleFromWorkerAction = ({ logger, action, messager, next }) => {
+  if (logger) console.log("FROM WORKER", performance.now(), action);
   if (action.type === "TICKER_START") {
-    perfData.length = 0;
-    ticker.start();
+    resetPerf();
+    messager.startTicking();
   }
-  if (action.type === "TICKER_STOP") ticker.stop();
+  if (action.type === "TICKER_STOP") messager.stopTicking();
   if (action.type === "TICKER_PONG") {
-    perfData.push(performance.now() - action.payload.time);
+    addToPerf(action);
   }
+  return next(action);
 };
 
-const sendPingToWorker = (sendToThisWorker, logger) => tick => {
-  const pingAction = {
-    type: "TICKER_PING",
-    payload: { tick, time: performance.now() },
-    meta: { toWorker: true }
-  };
-  if (logger) console.log("ACTION TO WORKER", performance.now(), pingAction);
-  sendToThisWorker(pingAction);
-};
-
-export const createWorkerMiddleware = ({ worker, logger }) => store => {
+export const createWorkerMiddleware = ({ logger, worker }) => store => {
   listenToWorkerActions({ worker, store });
+  const messager = new Messager({ logger, worker });
   const sendToThisWorker = sendToWorker(worker);
-  const ticker = new Ticker(sendPingToWorker(sendToThisWorker, logger));
   return next => action => {
-    if (!action) return console.log("NO ACTION");
-    if (action.meta && action.meta.toWorker) {
-      if (logger) console.log("ACTION TO WORKER", action, performance.now());
-      return sendToThisWorker(action);
-    }
+    if (action.meta && action.meta.toWorker) return messager.dispatch(action);
     if (action.meta && action.meta.toMain) {
-      handleFromWorkerAction({ logger, action, ticker });
-      return next(action);
+      return handleFromWorkerAction({ logger, action, messager, next });
     }
-    if (logger) console.log("ACTION WITHOUT DIRECTION", action);
+    if (logger) console.log("WITHOUT DIRECTION", action);
   };
 };
 
-export const createMainMiddleware = ({ logger = false }) => store => {
+export const createMainMiddleware = ({ logger }) => store => {
   listenToMainActions(store);
   return next => action => {
     if (action && action.meta && action.meta.toMain) {
-      if (logger) console.log("ACTION TO MAIN", performance.now(), action);
+      if (logger) console.log("TO MAIN    ", performance.now(), action);
       sendToMain(action);
     } else if (action && action.meta && action.meta.toWorker) {
-      if (logger) console.log("ACTION FROM MAIN", performance.now(), action);
+      if (logger) console.log("FROM MAIN  ", performance.now(), action);
       next(action);
     } else if (action) {
-      if (logger) console.log("ACTION WITHOUT DIRECTION", action);
+      if (logger) console.log("WITHOUT DIRECTION", action);
     }
   };
 };

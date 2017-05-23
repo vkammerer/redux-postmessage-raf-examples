@@ -24,7 +24,7 @@ const App = sources => {
   }));
 
   // NAME
-  const nameAction$ = action$.filter(a => a.type === "GET_NAME");
+  const nameAction$ = action$.filter(a => a.type === "NAME_GET");
   const nameSink$ = nameAction$.mapTo({
     type: "NAME_SET",
     payload: { name: "Jack" },

@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 const getNameAction = {
-  type: "GET_NAME",
+  type: "NAME_GET",
   meta: { toWorker: true }
 };
 
