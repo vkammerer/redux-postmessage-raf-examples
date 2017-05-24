@@ -1,4 +1,4 @@
-export const sendToWorker = worker => message => {
+export const sendToWorker = (worker, message) => {
   const stringed = JSON.stringify(message);
   worker.postMessage(stringed);
 };

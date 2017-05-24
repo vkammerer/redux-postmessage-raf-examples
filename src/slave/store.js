@@ -16,7 +16,7 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
-const mainMiddleware = createMainMiddleware({ logger: false });
+const mainMiddleware = createMainMiddleware({ logger: true });
 
 const cycleMiddleware = createCycleMiddleware();
 export const { makeActionDriver, makeStateDriver } = cycleMiddleware;

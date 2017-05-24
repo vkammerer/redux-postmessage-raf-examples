@@ -1,29 +1,24 @@
 import { sendToMain } from "./worker";
-import { logWithPerf } from "./utils";
 
 class MainMessager {
-  constructor({ logger }) {
+  constructor({ logger, getTickAction }) {
     this.logger = logger;
-    this.actions = [];
+    this.getTickAction = getTickAction;
     this.ticking = false;
-    this.send = sendToMain.bind(this);
-    this.pushAction = this.pushAction.bind(this);
+    this.actions = [];
     this.sendActions = this.sendActions.bind(this);
     this.dispatch = this.dispatch.bind(this);
     this.startTicking = this.startTicking.bind(this);
     this.stopTicking = this.stopTicking.bind(this);
     this.tick = this.tick.bind(this);
   }
-  pushAction(action) {
-    if (this.logger) logWithPerf("TO MAIN    ", action);
-    this.actions.push(action);
-  }
   sendActions() {
-    this.send({ actions: this.actions });
+    if (this.actions.length === 0) return;
+    sendToMain({ actions: this.actions });
     this.actions.length = 0;
   }
   dispatch(action) {
-    this.pushAction(action);
+    this.actions.push(action);
     if (!this.ticking) return this.sendActions();
   }
   startTicking() {
@@ -31,16 +26,11 @@ class MainMessager {
   }
   stopTicking() {
     this.ticking = false;
+    this.sendActions();
   }
   tick(pingAction) {
-    this.pushAction({
-      type: "TICKER_PONG",
-      payload: {
-        count: pingAction.payload.count,
-        time: pingAction.payload.time
-      },
-      meta: { toMain: true }
-    });
+    if (!this.ticking) return;
+    this.dispatch(this.getTickAction(pingAction));
     this.sendActions();
   }
 }

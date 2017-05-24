@@ -1,13 +1,13 @@
 import { sendToWorker } from "./worker";
-import { logWithPerf } from "./utils";
 
 class WorkerMessager {
-  constructor({ logger, worker }) {
+  constructor({ logger, worker, getTickAction }) {
     this.logger = logger;
+    this.worker = worker;
+    this.getTickAction = getTickAction;
     this.ticking = false;
     this.count = 0;
     this.actions = [];
-    this.send = sendToWorker(worker).bind(this);
     this.sendActions = this.sendActions.bind(this);
     this.dispatch = this.dispatch.bind(this);
     this.startTicking = this.startTicking.bind(this);
@@ -16,11 +16,10 @@ class WorkerMessager {
   }
   sendActions() {
     if (this.actions.length === 0) return;
-    this.send({ actions: this.actions });
+    sendToWorker(this.worker, { actions: this.actions });
     this.actions.length = 0;
   }
   dispatch(action) {
-    if (this.logger) logWithPerf("TO WORKER  ", action);
     this.actions.push(action);
     if (!this.ticking) this.sendActions();
   }
@@ -36,14 +35,7 @@ class WorkerMessager {
   tick() {
     if (!this.ticking) return;
     requestAnimationFrame(this.tick);
-    this.dispatch({
-      type: "TICKER_PING",
-      payload: {
-        count: this.count,
-        time: performance.now()
-      },
-      meta: { toWorker: true }
-    });
+    this.dispatch(this.getTickAction(this.count));
     this.sendActions();
     this.count++;
   }
