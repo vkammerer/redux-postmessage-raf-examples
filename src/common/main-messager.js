@@ -1,20 +1,21 @@
-import { sendToWorker } from "./worker";
+import { sendToMain } from "./worker";
+import { logWithPerf } from "./utils";
 
-class Messager {
-  constructor({ logger, worker }) {
+class MainMessager {
+  constructor({ logger }) {
     this.logger = logger;
-    this.ticking = false;
-    this.count = 0;
     this.actions = [];
-    this.send = sendToWorker(worker);
+    this.ticking = false;
+    this.send = sendToMain.bind(this);
+    this.pushAction = this.pushAction.bind(this);
+    this.sendActions = this.sendActions.bind(this);
+    this.dispatch = this.dispatch.bind(this);
     this.startTicking = this.startTicking.bind(this);
     this.stopTicking = this.stopTicking.bind(this);
     this.tick = this.tick.bind(this);
-    this.dispatch = this.dispatch.bind(this);
-    this.sendActions = this.sendActions.bind(this);
   }
   pushAction(action) {
-    if (this.logger) console.log("TO WORKER  ", performance.now(), action);
+    if (this.logger) logWithPerf("TO MAIN    ", action);
     this.actions.push(action);
   }
   sendActions() {
@@ -27,25 +28,21 @@ class Messager {
   }
   startTicking() {
     this.ticking = true;
-    this.count = 0;
-    requestAnimationFrame(this.tick);
   }
   stopTicking() {
     this.ticking = false;
   }
-  tick() {
-    if (this.ticking) requestAnimationFrame(this.tick);
+  tick(pingAction) {
     this.pushAction({
-      type: "TICKER_PING",
+      type: "TICKER_PONG",
       payload: {
-        tick: this.count,
-        time: performance.now()
+        count: pingAction.payload.count,
+        time: pingAction.payload.time
       },
-      meta: { toWorker: true }
+      meta: { toMain: true }
     });
     this.sendActions();
-    this.count++;
   }
 }
 
-export default Messager;
+export default MainMessager;

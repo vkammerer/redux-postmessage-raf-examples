@@ -16,12 +16,6 @@ const App = sources => {
       type: !isTicking ? "TICKER_START" : "TICKER_STOP",
       meta: { toMain: true }
     }));
-  const pingAction$ = action$.filter(a => a.type === "TICKER_PING");
-  const pongSink$ = pingAction$.map(a => ({
-    type: "TICKER_PONG",
-    payload: a.payload,
-    meta: { toMain: true }
-  }));
 
   // NAME
   const nameAction$ = action$.filter(a => a.type === "NAME_GET");
@@ -45,12 +39,7 @@ const App = sources => {
       meta: { toMain: true }
     }));
 
-  const actionSink$ = xs.merge(
-    toggleSink$,
-    pongSink$,
-    nameSink$,
-    articlesSink$
-  );
+  const actionSink$ = xs.merge(toggleSink$, nameSink$, articlesSink$);
   return {
     ACTION: actionSink$
   };

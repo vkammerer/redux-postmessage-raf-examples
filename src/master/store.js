@@ -3,7 +3,7 @@ import { createWorkerMiddleware } from "../common/redux-worker";
 import { slaveWorker } from "./slaveWorker";
 
 const defaultState = {
-  tick: 0,
+  count: 0,
   ticker: "stopped",
   perfData: [],
   perfMean: "-",
@@ -28,7 +28,7 @@ const reducer = (state = defaultState, action) => {
     case "TICKER_PONG": {
       return {
         ...state,
-        tick: action.payload.tick
+        count: action.payload.count
       };
     }
 

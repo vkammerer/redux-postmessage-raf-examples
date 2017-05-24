@@ -22,12 +22,14 @@ const Animation = props => (
   <div className="animation">
     <div
       className="animated"
-      style={{ transform: `scale(${props.tick % 200 / 200})` }}
+      style={{ transform: `scale(${props.count % 200 / 200})` }}
     />
   </div>
 );
 
-const ConnectedAnimation = connect(state => ({ tick: state.tick }))(Animation);
+const ConnectedAnimation = connect(state => ({ count: state.count }))(
+  Animation
+);
 
 const Metrics = props => {
   const perf = getMetrics();
