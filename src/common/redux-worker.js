@@ -4,14 +4,17 @@ import { sendToWorker, sendToMain } from "./worker";
 import { addToPerf, resetPerf } from "./perf";
 import { logWithPerf } from "./utils";
 
-const handleMessage = mE => {
-  const message = JSON.parse(mE.data);
-  if (message.actions) message.actions.forEach(store.dispatch);
+const messageHandler = store => {
+  const handleMessage = mE => {
+    const message = JSON.parse(mE.data);
+    if (message.actions) message.actions.forEach(store.dispatch);
+  };
+  return handleMessage;
 };
 
 const listenToThread = (store, worker) => {
   const messageEmitter = worker || self;
-  messageEmitter.addEventListener("message", handleMessage);
+  messageEmitter.addEventListener("message", messageHandler(store));
 };
 
 const handleFromWorkerAction = ({ logger, action, messager, next }) => {
