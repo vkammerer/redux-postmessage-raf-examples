@@ -6,7 +6,7 @@ const defaultState = { ticking: false };
 
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
-    case "TICK_TOGGLE":
+    case "PING_TOGGLE":
       return {
         ...state,
         ticking: !state.ticking

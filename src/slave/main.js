@@ -8,12 +8,12 @@ const App = sources => {
   const firebase$ = sources.firebase;
 
   // TICKER
-  const toggleAction$ = action$.filter(a => a.type === "TICK_TOGGLE");
+  const toggleAction$ = action$.filter(a => a.type === "PING_TOGGLE");
   const isTicking$ = state$.map(state => state.ticking);
   const toggleSink$ = toggleAction$
     .compose(sampleCombine(isTicking$))
     .map(([, isTicking]) => ({
-      type: !isTicking ? "TICK_START" : "TICK_STOP",
+      type: !isTicking ? "PING_START" : "PING_STOP",
       meta: { toMain: true }
     }));
 

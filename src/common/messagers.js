@@ -1,90 +1,103 @@
 import { sendToWorker, sendToMain } from "./worker";
 
-const listenToPoster = ({ poster, onAction }) => {
-  poster.addEventListener("message", function handleMessage(mE) {
+export const mainMessager = ({ worker, onReceiveAction, onBeforePing }) => {
+  // INIT
+  worker.addEventListener("message", function handleMessage(mE) {
     const message = JSON.parse(mE.data);
-    if (message.actions) message.actions.forEach(onAction);
+    if (!message.type || !message.type === "WWM_TO_MAIN") return;
+    message.payload.forEach(onReceiveAction);
+    if (message.meta.pingRequest === "start") startPing();
+    if (message.meta.pingRequest === "stop") stopPing();
   });
-};
-
-export const mainMessager = ({ worker, getPingAction, onAction }) => {
-  listenToPoster({ poster: worker, onAction });
 
   // STATE
-  let ticking = false;
+  let pinging = false;
   let count = 0;
   const actions = [];
 
   // PRIVATE
-  const sendActions = () => {
-    if (actions.length === 0) return;
-    sendToWorker(worker, { actions });
+  const sendAll = pingData => {
+    sendToWorker(worker, {
+      type: "WWM_TO_WORKER",
+      meta: { pingData },
+      payload: actions
+    });
     actions.length = 0;
   };
   const ping = () => {
-    if (!ticking) return;
+    if (!pinging) return;
     requestAnimationFrame(ping);
-    dispatch(getPingAction(count));
-    sendActions();
+    if (onBeforePing) onBeforePing(post, count);
+    const pingData = { count, time: performance.now() };
+    sendAll(pingData);
     count++;
   };
 
   // PUBLIC
-  const dispatch = action => {
+  const post = action => {
     actions.push(action);
-    if (!ticking) sendActions();
+    if (!pinging) sendAll();
   };
-  const startTicking = () => {
-    ticking = true;
+  const startPing = () => {
+    pinging = true;
     count = 0;
     requestAnimationFrame(ping);
   };
-  const stopTicking = () => {
-    ticking = false;
-    sendActions();
+  const stopPing = () => {
+    pinging = false;
+    sendAll();
   };
   return {
-    dispatch,
-    startTicking,
-    stopTicking
+    post,
+    startPing,
+    stopPing
   };
 };
 
-export const workerMessager = ({ getPongAction, onAction }) => {
-  listenToPoster({ poster: self, onAction });
+export const workerMessager = ({ onReceiveAction, onBeforePong }) => {
+  // INIT
+  self.addEventListener("message", function handleMessage(mE) {
+    const message = JSON.parse(mE.data);
+    if (!message.type || !message.type === "WWM_TO_WORKER") return;
+    message.payload.forEach(onReceiveAction);
+    if (message.meta.pingData) pong(message.meta.pingData);
+  });
 
   // STATE
-  let ticking = false;
+  let pinging = false;
   const actions = [];
 
   // PRIVATE
-  const sendActions = () => {
-    if (actions.length === 0) return;
-    sendToMain({ actions });
+  const sendAll = ({ pingRequest, pongData }) => {
+    sendToMain({
+      type: "WWM_TO_MAIN",
+      meta: { pingRequest, pongData },
+      payload: actions
+    });
     actions.length = 0;
+  };
+  const pong = pingData => {
+    if (!pinging) return;
+    if (onBeforePong) onBeforePong(post, pingData);
+    sendAll({ pongData: pingData });
   };
 
   // PUBLIC
-  const dispatch = action => {
+  const post = action => {
     actions.push(action);
-    if (!ticking) sendActions();
+    if (!pinging) sendAll({});
   };
-  const startTicking = () => {
-    ticking = true;
+  const startPing = () => {
+    pinging = true;
+    sendAll({ pingRequest: "start" });
   };
-  const stopTicking = () => {
-    ticking = false;
-    sendActions();
-  };
-  const pong = pingAction => {
-    if (!ticking) return;
-    dispatch(getPongAction(pingAction));
-    sendActions();
+  const stopPing = () => {
+    pinging = false;
+    sendAll({ pingRequest: "stop" });
   };
   return {
-    dispatch,
-    startTicking,
-    stopTicking,
-    pong
+    post,
+    startPing,
+    stopPing
   };
 };
