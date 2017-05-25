@@ -1,5 +1,4 @@
-import WorkerMessager from "./worker-messager";
-import MainMessager from "./main-messager";
+import { makeWorkerMessager, makeMainMessager } from "./messagers";
 import { addToPerf, resetPerf } from "./perf";
 import { logWithPerf } from "./utils";
 
@@ -66,7 +65,7 @@ const createGetWorkerTickAction = logger =>
 
 export const createWorkerMiddleware = ({ logger, worker }) => store => {
   listenToThread(store, worker);
-  const messager = new WorkerMessager({
+  const messager = makeWorkerMessager({
     logger,
     worker,
     getTickAction: createGetMainTickAction(logger)
@@ -83,7 +82,7 @@ export const createWorkerMiddleware = ({ logger, worker }) => store => {
 
 export const createMainMiddleware = ({ logger }) => store => {
   listenToThread(store);
-  const messager = new MainMessager({
+  const messager = makeMainMessager({
     logger,
     getTickAction: createGetWorkerTickAction(logger)
   });
