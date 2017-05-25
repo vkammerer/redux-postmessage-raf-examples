@@ -1,6 +1,15 @@
 import { sendToWorker, sendToMain } from "./worker";
 
-export const makeWorkerMessager = ({ logger, worker, getTickAction }) => {
+const listenToPoster = ({ poster, onAction }) => {
+  poster.addEventListener("message", function handleMessage(mE) {
+    const message = JSON.parse(mE.data);
+    if (message.actions) message.actions.forEach(onAction);
+  });
+};
+
+export const mainMessager = ({ worker, getPingAction, onAction }) => {
+  listenToPoster({ poster: worker, onAction });
+
   // STATE
   let ticking = false;
   let count = 0;
@@ -12,10 +21,10 @@ export const makeWorkerMessager = ({ logger, worker, getTickAction }) => {
     sendToWorker(worker, { actions });
     actions.length = 0;
   };
-  const tickPing = () => {
+  const ping = () => {
     if (!ticking) return;
-    requestAnimationFrame(tickPing);
-    dispatch(getTickAction(count));
+    requestAnimationFrame(ping);
+    dispatch(getPingAction(count));
     sendActions();
     count++;
   };
@@ -28,7 +37,7 @@ export const makeWorkerMessager = ({ logger, worker, getTickAction }) => {
   const startTicking = () => {
     ticking = true;
     count = 0;
-    requestAnimationFrame(tickPing);
+    requestAnimationFrame(ping);
   };
   const stopTicking = () => {
     ticking = false;
@@ -41,7 +50,9 @@ export const makeWorkerMessager = ({ logger, worker, getTickAction }) => {
   };
 };
 
-export const makeMainMessager = ({ logger, worker, getTickAction }) => {
+export const workerMessager = ({ getPongAction, onAction }) => {
+  listenToPoster({ poster: self, onAction });
+
   // STATE
   let ticking = false;
   const actions = [];
@@ -65,15 +76,15 @@ export const makeMainMessager = ({ logger, worker, getTickAction }) => {
     ticking = false;
     sendActions();
   };
-  const tickPong = pingAction => {
+  const pong = pingAction => {
     if (!ticking) return;
-    dispatch(getTickAction(pingAction));
+    dispatch(getPongAction(pingAction));
     sendActions();
   };
   return {
     dispatch,
     startTicking,
     stopTicking,
-    tickPong
+    pong
   };
 };

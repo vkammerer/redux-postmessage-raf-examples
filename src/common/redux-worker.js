@@ -1,42 +1,34 @@
-import { makeWorkerMessager, makeMainMessager } from "./messagers";
+import { mainMessager, workerMessager } from "./messagers";
 import { addToPerf, resetPerf } from "./perf";
 import { logWithPerf } from "./utils";
 
-const listenToThread = (store, worker) => {
-  const messageEmitter = worker || self;
-  messageEmitter.addEventListener("message", function handleMessage(mE) {
-    const message = JSON.parse(mE.data);
-    if (message.actions) message.actions.forEach(store.dispatch);
-  });
-};
-
-const handleToWorkerAction = ({ logger, messager, action }) => {
-  if (logger) logWithPerf("TO WORKER  ", action);
+const handleToWorkerAction = ({ debug, messager, action }) => {
+  if (debug) logWithPerf("TO WORKER  ", action);
   messager.dispatch(action);
 };
 
-const handleFromWorkerAction = ({ logger, messager, next, action }) => {
-  if (logger) logWithPerf("FROM WORKER", action);
+const handleFromWorkerAction = ({ debug, messager, next, action }) => {
+  if (debug) logWithPerf("FROM WORKER", action);
   if (action.type === "TICK_START") messager.startTicking();
   if (action.type === "TICK_STOP") messager.stopTicking();
   next(action);
 };
 
-const handleToMainAction = ({ logger, messager, action }) => {
-  if (logger) logWithPerf("TO MAIN    ", action);
+const handleToMainAction = ({ debug, messager, action }) => {
+  if (debug) logWithPerf("TO MAIN    ", action);
   messager.dispatch(action);
   if (action.type === "TICK_START") messager.startTicking();
   if (action.type === "TICK_STOP") messager.stopTicking();
 };
 
-const handleFromMainAction = ({ logger, messager, next, action }) => {
-  if (logger) logWithPerf("FROM MAIN  ", action);
-  if (action.type === "TICK_PING") messager.tickPong(action);
+const handleFromMainAction = ({ debug, messager, next, action }) => {
+  if (debug) logWithPerf("FROM MAIN  ", action);
+  if (action.type === "TICK_PING") messager.pong(action);
   next(action);
 };
 
-const createGetMainTickAction = logger =>
-  function getMainTickAction(count) {
+const createGetPingAction = debug =>
+  function getPingAction(count) {
     const action = {
       type: "TICK_PING",
       payload: {
@@ -45,12 +37,12 @@ const createGetMainTickAction = logger =>
       },
       meta: { toWorker: true }
     };
-    if (logger) logWithPerf("TO WORKER  ", action);
+    if (debug) logWithPerf("TO WORKER  ", action);
     return action;
   };
 
-const createGetWorkerTickAction = logger =>
-  function getWorkerTickAction(pingAction) {
+const createGetPongAction = debug =>
+  function getPongAction(pingAction) {
     const action = {
       type: "TICK_PONG",
       payload: {
@@ -59,40 +51,40 @@ const createGetWorkerTickAction = logger =>
       },
       meta: { toMain: true }
     };
-    if (logger) logWithPerf("TO MAIN    ", action);
+    if (debug) logWithPerf("TO MAIN    ", action);
     return action;
   };
 
-export const createWorkerMiddleware = ({ logger, worker }) => store => {
-  listenToThread(store, worker);
-  const messager = makeWorkerMessager({
-    logger,
+export const createMainMiddleware = ({ debug, worker }) => store => {
+  const messager = mainMessager({
+    debug,
     worker,
-    getTickAction: createGetMainTickAction(logger)
+    onAction: store.dispatch,
+    getPingAction: createGetPingAction(debug)
   });
   return next =>
     function handleActionInMiddleware(action) {
       if (action.meta && action.meta.toWorker)
-        return handleToWorkerAction({ logger, messager, action });
+        return handleToWorkerAction({ debug, messager, action });
       if (action.meta && action.meta.toMain)
-        return handleFromWorkerAction({ logger, action, messager, next });
-      if (logger) console.log("WITHOUT DIRECTION", action);
+        return handleFromWorkerAction({ debug, messager, next, action });
+      if (debug) console.log("WITHOUT DIRECTION", action);
     };
 };
 
-export const createMainMiddleware = ({ logger }) => store => {
-  listenToThread(store);
-  const messager = makeMainMessager({
-    logger,
-    getTickAction: createGetWorkerTickAction(logger)
+export const createWorkerMiddleware = ({ debug }) => store => {
+  const messager = workerMessager({
+    debug,
+    onAction: store.dispatch,
+    getPongAction: createGetPongAction(debug)
   });
   return next =>
     function handleActionInMiddleware(action) {
       if (action.meta && action.meta.toMain)
-        return handleToMainAction({ logger, messager, action });
+        return handleToMainAction({ debug, messager, action });
       if (action.meta && action.meta.toWorker) {
-        return handleFromMainAction({ logger, messager, next, action });
+        return handleFromMainAction({ debug, messager, next, action });
       }
-      if (logger) console.log("WITHOUT DIRECTION", action);
+      if (debug) console.log("WITHOUT DIRECTION", action);
     };
 };

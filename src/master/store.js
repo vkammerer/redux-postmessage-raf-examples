@@ -1,5 +1,5 @@
 import { createStore, applyMiddleware } from "redux";
-import { createWorkerMiddleware } from "../common/redux-worker";
+import { createMainMiddleware } from "../common/redux-worker";
 import { createPongPerfMiddleware } from "../common/perf";
 import { slaveWorker } from "./slaveWorker";
 
@@ -48,14 +48,14 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
-const slaveWorkerMiddleware = createWorkerMiddleware({
+const mainMiddleware = createMainMiddleware({
   worker: slaveWorker,
-  logger: true
+  debug: true
 });
 
-const pongPerfMiddleware = createPongPerfMiddleware({ logger: true });
+const pongPerfMiddleware = createPongPerfMiddleware({ debug: true });
 
 export const store = createStore(
   reducer,
-  applyMiddleware(slaveWorkerMiddleware, pongPerfMiddleware)
+  applyMiddleware(mainMiddleware, pongPerfMiddleware)
 );
