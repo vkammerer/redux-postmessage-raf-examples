@@ -16,17 +16,17 @@ const defaultState = {
 
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
-    case "TICKER_START":
+    case "TICK_START":
       return {
         ...state,
         ticker: "started"
       };
-    case "TICKER_STOP":
+    case "TICK_STOP":
       return {
         ...state,
         ticker: "stopped"
       };
-    case "TICKER_PONG": {
+    case "TICK_PONG": {
       return {
         ...state,
         count: action.payload.count

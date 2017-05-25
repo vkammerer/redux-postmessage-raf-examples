@@ -21,7 +21,7 @@ export const getMetrics = () => {
 
 export const createPongPerfMiddleware = ({ logger }) => store => next =>
   function handleActionInMiddleware(action) {
-    if (action.type === "TICKER_START") resetPerf();
-    if (action.type === "TICKER_PONG") addToPerf(action);
+    if (action.type === "TICK_START") resetPerf();
+    if (action.type === "TICK_PONG") addToPerf(action);
     return next(action);
   };

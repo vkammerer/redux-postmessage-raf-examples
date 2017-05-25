@@ -17,28 +17,28 @@ const handleToWorkerAction = ({ logger, messager, action }) => {
 
 const handleFromWorkerAction = ({ logger, messager, next, action }) => {
   if (logger) logWithPerf("FROM WORKER", action);
-  if (action.type === "TICKER_START") messager.startTicking();
-  if (action.type === "TICKER_STOP") messager.stopTicking();
+  if (action.type === "TICK_START") messager.startTicking();
+  if (action.type === "TICK_STOP") messager.stopTicking();
   next(action);
 };
 
 const handleToMainAction = ({ logger, messager, action }) => {
   if (logger) logWithPerf("TO MAIN    ", action);
   messager.dispatch(action);
-  if (action.type === "TICKER_START") messager.startTicking();
-  if (action.type === "TICKER_STOP") messager.stopTicking();
+  if (action.type === "TICK_START") messager.startTicking();
+  if (action.type === "TICK_STOP") messager.stopTicking();
 };
 
 const handleFromMainAction = ({ logger, messager, next, action }) => {
   if (logger) logWithPerf("FROM MAIN  ", action);
-  if (action.type === "TICKER_PING") messager.tick(action);
+  if (action.type === "TICK_PING") messager.tickPong(action);
   next(action);
 };
 
 const createGetMainTickAction = logger =>
   function getMainTickAction(count) {
     const action = {
-      type: "TICKER_PING",
+      type: "TICK_PING",
       payload: {
         count,
         time: performance.now()
@@ -52,7 +52,7 @@ const createGetMainTickAction = logger =>
 const createGetWorkerTickAction = logger =>
   function getWorkerTickAction(pingAction) {
     const action = {
-      type: "TICKER_PONG",
+      type: "TICK_PONG",
       payload: {
         count: pingAction.payload.count,
         time: pingAction.payload.time

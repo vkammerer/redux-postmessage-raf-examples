@@ -14,7 +14,7 @@ const Button = props => (
 const ConnectedButton = connect(state => ({ ticker: state.ticker }))(Button);
 
 const toggleTickerAction = {
-  type: "TICKER_TOGGLE",
+  type: "TICK_TOGGLE",
   meta: { toWorker: true }
 };
 

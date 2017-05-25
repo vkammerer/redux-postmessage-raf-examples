@@ -12,15 +12,15 @@ export const makeWorkerMessager = ({ logger, worker, getTickAction }) => {
     sendToWorker(worker, { actions });
     actions.length = 0;
   };
-  const tick = () => {
+  const tickPing = () => {
     if (!ticking) return;
-    requestAnimationFrame(tick);
+    requestAnimationFrame(tickPing);
     dispatch(getTickAction(count));
     sendActions();
     count++;
   };
 
-  // PUBLIC API
+  // PUBLIC
   const dispatch = action => {
     actions.push(action);
     if (!ticking) sendActions();
@@ -28,7 +28,7 @@ export const makeWorkerMessager = ({ logger, worker, getTickAction }) => {
   const startTicking = () => {
     ticking = true;
     count = 0;
-    requestAnimationFrame(tick);
+    requestAnimationFrame(tickPing);
   };
   const stopTicking = () => {
     ticking = false;
@@ -44,7 +44,6 @@ export const makeWorkerMessager = ({ logger, worker, getTickAction }) => {
 export const makeMainMessager = ({ logger, worker, getTickAction }) => {
   // STATE
   let ticking = false;
-  let count = 0;
   const actions = [];
 
   // PRIVATE
@@ -54,7 +53,7 @@ export const makeMainMessager = ({ logger, worker, getTickAction }) => {
     actions.length = 0;
   };
 
-  // PUBLIC API
+  // PUBLIC
   const dispatch = action => {
     actions.push(action);
     if (!ticking) sendActions();
@@ -66,7 +65,7 @@ export const makeMainMessager = ({ logger, worker, getTickAction }) => {
     ticking = false;
     sendActions();
   };
-  const tick = pingAction => {
+  const tickPong = pingAction => {
     if (!ticking) return;
     dispatch(getTickAction(pingAction));
     sendActions();
@@ -75,6 +74,6 @@ export const makeMainMessager = ({ logger, worker, getTickAction }) => {
     dispatch,
     startTicking,
     stopTicking,
-    tick
+    tickPong
   };
 };
