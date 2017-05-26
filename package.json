@@ -10,6 +10,7 @@
   "license": "MIT",
   "devDependencies": {
     "@cycle/run": "^3.1.0",
+    "@vkammerer/redux-postmessage-raf": "0.0.3",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",

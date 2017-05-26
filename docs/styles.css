@@ -40,15 +40,17 @@ ul {
 }
 
 .animation {
-  margin-bottom: 10px;
   position: relative;
   background: black;
-  height: 200px;
-  margin-bottom: 10px;
+  width: 300px;
+  height: 300px;
+  margin: 10px auto;
   overflow: hidden;
+  border-radius: 50%;
 }
 .animated {
   position: absolute;
+  border-radius: 50%;
   left: 0;
   right: 0;
   background: red;

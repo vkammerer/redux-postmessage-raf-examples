@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from "redux";
 import { createCycleMiddleware } from "redux-cycles";
-import { createWorkerMiddleware } from "../common/redux-worker";
+import { createWorkerMiddleware } from "@vkammerer/redux-postmessage-raf";
 
 const defaultState = { ticking: false };
 
@@ -16,7 +16,11 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
-const mainMiddleware = createWorkerMiddleware({ debug: true });
+const mainMiddleware = createWorkerMiddleware(
+  {
+    // debug: true
+  }
+);
 
 const cycleMiddleware = createCycleMiddleware();
 export const { makeActionDriver, makeStateDriver } = cycleMiddleware;

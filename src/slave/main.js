@@ -1,6 +1,18 @@
 import xs from "xstream";
 import sampleCombine from "xstream/extra/sampleCombine";
 import { objectPropsToArray } from "../common/utils";
+import concat from "xstream/extra/concat";
+
+const delayedActions$ = xs.fromArray(
+  [...Array(1000).keys()].map((n, i) => ({
+    type: "ANIMATION",
+    payload: i,
+    meta: {
+      toMain: true,
+      delay: { index: i + 2 }
+    }
+  }))
+);
 
 const App = sources => {
   const state$ = sources.STATE;
@@ -12,10 +24,35 @@ const App = sources => {
   const isTicking$ = state$.map(state => state.ticking);
   const toggleSink$ = toggleAction$
     .compose(sampleCombine(isTicking$))
-    .map(([, isTicking]) => ({
-      type: !isTicking ? "PING_START" : "PING_STOP",
-      meta: { toMain: true }
-    }));
+    .map(([, isTicking]) =>
+      xs.fromArray([
+        {
+          type: !isTicking ? "PING_START" : "PING_STOP"
+        },
+        {
+          type: !isTicking ? "PING_START" : "PING_STOP",
+          meta: { toMain: true }
+        }
+      ])
+    )
+    .flatten();
+
+  const pingAction$ = action$.filter(a => a.type === "PONG");
+  const animationAction$ = pingAction$.map(a => ({
+    type: "ANIMATION",
+    payload: a.payload.count,
+    meta: {
+      toMain: true,
+      delay: { count: a.payload.count + 2 }
+    }
+  }));
+
+  // const pingAction$ = action$.filter(a => a.type === "PONG");
+  // const pingCountIs10$ = pingAction$
+  //   .map(a => a.payload.count)
+  //   .filter(count => count === 10)
+  //   .take(1);
+  // const animationAction$ = concat(pingCountIs10$, delayedActions$).drop(1);
 
   // NAME
   const nameAction$ = action$.filter(a => a.type === "NAME_GET");
@@ -39,7 +76,12 @@ const App = sources => {
       meta: { toMain: true }
     }));
 
-  const actionSink$ = xs.merge(toggleSink$, nameSink$, articlesSink$);
+  const actionSink$ = xs.merge(
+    toggleSink$,
+    nameSink$,
+    articlesSink$,
+    animationAction$
+  );
   return {
     ACTION: actionSink$
   };

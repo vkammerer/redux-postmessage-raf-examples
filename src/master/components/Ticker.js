@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getMetrics } from "../../common/perf";
+
+const FRAMES_TILL_FULL = 80;
 
 const Button = props => (
   <button
@@ -22,47 +23,16 @@ const Animation = props => (
   <div className="animation">
     <div
       className="animated"
-      style={{ transform: `scale(${props.count % 200 / 200})` }}
+      style={{
+        transform: `scale(${props.scale % FRAMES_TILL_FULL / FRAMES_TILL_FULL})`
+      }}
     />
   </div>
 );
 
-const ConnectedAnimation = connect(state => ({ count: state.count }))(
+const ConnectedAnimation = connect(state => ({ scale: state.scale }))(
   Animation
 );
-
-const Metrics = props => {
-  const perf = getMetrics();
-  return (
-    <div>
-      <div className="output">
-        <p>
-          Roundtrip time in ms:
-        </p>
-        <strong>Mean:</strong>
-        <div>{perf.mean}</div>
-        <strong>Min:</strong>
-        <div>{perf.min}</div>
-        <strong>Max:</strong>
-        <div>{perf.max}</div>
-      </div>
-      <div className="perfData">
-        {props.ticker === "stopped" &&
-          perf.data.map((perfD, index) => (
-            <div
-              key={index}
-              className="perfD"
-              style={{
-                width: `${perfD / perf.max * 100}%`
-              }}
-            />
-          ))}
-      </div>
-    </div>
-  );
-};
-
-const ConnectedMetrics = connect(state => ({ ticker: state.ticker }))(Metrics);
 
 const Ticker = props => (
   <div>
@@ -72,7 +42,6 @@ const Ticker = props => (
     </p>
     <ConnectedButton />
     <ConnectedAnimation />
-    <ConnectedMetrics />
   </div>
 );
 

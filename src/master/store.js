@@ -1,6 +1,5 @@
 import { createStore, applyMiddleware } from "redux";
-import { createMainMiddleware } from "../common/redux-worker";
-import { createPongPerfMiddleware } from "../common/perf";
+import { createMainMiddleware } from "@vkammerer/redux-postmessage-raf";
 import { slaveWorker } from "./slaveWorker";
 
 const defaultState = {
@@ -26,10 +25,10 @@ const reducer = (state = defaultState, action) => {
         ...state,
         ticker: "stopped"
       };
-    case "PONG": {
+    case "ANIMATION": {
       return {
         ...state,
-        count: action.payload.count
+        scale: action.payload
       };
     }
 
@@ -49,13 +48,8 @@ const reducer = (state = defaultState, action) => {
 };
 
 const mainMiddleware = createMainMiddleware({
-  worker: slaveWorker,
-  debug: true
+  // debug: true,
+  worker: slaveWorker
 });
 
-const pongPerfMiddleware = createPongPerfMiddleware({ debug: true });
-
-export const store = createStore(
-  reducer,
-  applyMiddleware(mainMiddleware, pongPerfMiddleware)
-);
+export const store = createStore(reducer, applyMiddleware(mainMiddleware));
