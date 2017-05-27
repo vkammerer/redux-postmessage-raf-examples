@@ -3,7 +3,7 @@ import { createMainMiddleware } from "@vkammerer/redux-postmessage-raf";
 import { slaveWorker } from "./slaveWorker";
 
 const defaultState = {
-  count: 0,
+  scale: 0,
   ticker: "stopped",
   perfData: [],
   perfMean: "-",

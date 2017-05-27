@@ -4,7 +4,7 @@ module.exports = {
   resolve: {
     extensions: [".js"]
   },
-  entry: { master: "./src/master/master.js", slave: "./src/slave/slave.js" },
+  entry: { master: "./src/master/master.js" },
   output: {
     path: __dirname + "/docs",
     filename: "[name].js"

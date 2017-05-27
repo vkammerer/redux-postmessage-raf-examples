@@ -16,7 +16,7 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
-const mainMiddleware = createWorkerMiddleware(
+const workerMiddleware = createWorkerMiddleware(
   {
     // debug: true
   }
@@ -27,5 +27,5 @@ export const { makeActionDriver, makeStateDriver } = cycleMiddleware;
 
 export const store = createStore(
   reducer,
-  applyMiddleware(mainMiddleware, cycleMiddleware)
+  applyMiddleware(workerMiddleware, cycleMiddleware)
 );

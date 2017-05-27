@@ -1,1 +1,3 @@
-export const slaveWorker = new Worker("./slave.js");
+const SlaveWorker = require("worker-loader!../slave/slave.js");
+
+export const slaveWorker = new SlaveWorker();
