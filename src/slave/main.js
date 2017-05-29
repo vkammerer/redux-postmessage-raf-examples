@@ -9,7 +9,7 @@ const delayedActions$ = xs.fromArray(
     payload: i,
     meta: {
       toMain: true,
-      delay: { index: i + 2 }
+      delay: { index: i }
     }
   }))
 );
@@ -37,20 +37,23 @@ const App = sources => {
     )
     .flatten();
 
-  const pingAction$ = action$.filter(a => a.type === "PONG");
-  const animationAction$ = pingAction$.map(a => ({
-    type: "ANIMATION",
-    payload: a.payload.count,
-    meta: {
-      toMain: true,
-      delay: { count: a.payload.count + 2 }
-    }
-  }));
+  const pingAction$ = action$.filter(a => a.type === "PONG_AFTER");
+  const animationAction$ = pingAction$.map(a => {
+    // console.log(a);
+    return {
+      type: "ANIMATION",
+      payload: a.payload,
+      meta: {
+        toMain: true,
+        delay: { pingCount: a.payload + 1 }
+      }
+    };
+  });
 
-  // const pingAction$ = action$.filter(a => a.type === "PONG");
+  // const pingAction$ = action$.filter(a => a.type === "PONG_AFTER");
   // const pingCountIs10$ = pingAction$
-  //   .map(a => a.payload.count)
-  //   .filter(count => count === 10)
+  //   .map(a => a.payload)
+  //   .filter(pingCount => pingCount === 10)
   //   .take(1);
   // const animationAction$ = concat(pingCountIs10$, delayedActions$).drop(1);
 

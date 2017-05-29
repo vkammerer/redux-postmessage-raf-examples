@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware } from "redux";
 import { createMainMiddleware } from "@vkammerer/redux-postmessage-raf";
+// import { createMainMiddleware } from "../../../redux-postmessage-raf";
 import { slaveWorker } from "./slaveWorker";
 
 const defaultState = {

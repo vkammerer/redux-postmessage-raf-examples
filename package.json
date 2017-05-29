@@ -1,16 +1,18 @@
 {
-  "name": "webworker-architecture",
+  "name": "redux-postmessage-raf-react",
   "version": "0.0.1",
   "description": "An example architecture using web workers",
   "scripts": {
+    "clean": "find docs | grep '.*\\.js$' | xargs rm",
     "dev": "node_modules/.bin/webpack-dev-server --devtool cheap-module-source-map --content-base docs --watch-content-base",
-    "prod": "node_modules/.bin/webpack --devtool inline-source-map --define process.env.NODE_ENV=\"'production'\""
+    "build": "node_modules/.bin/webpack --devtool inline-source-map --define process.env.NODE_ENV=\"'production'\"",
+    "prod": "npm run clean && npm run build"
   },
   "author": "Vincent Kammerer <vkammerer@gmail.com> (http://vincent-kammerer.com)",
   "license": "MIT",
   "devDependencies": {
     "@cycle/run": "^3.1.0",
-    "@vkammerer/redux-postmessage-raf": "0.0.4",
+    "@vkammerer/redux-postmessage-raf": "0.0.5",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
