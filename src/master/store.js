@@ -4,12 +4,8 @@ import { createMainMiddleware } from "@vkammerer/redux-postmessage-raf";
 import { slaveWorker } from "./slaveWorker";
 
 const defaultState = {
+  pinging: false,
   scale: 0,
-  ticker: "stopped",
-  perfData: [],
-  perfMean: "-",
-  perfMin: "-",
-  perfMax: "-",
   name: "John",
   articles: []
 };
@@ -19,12 +15,12 @@ const reducer = (state = defaultState, action) => {
     case "PING_START":
       return {
         ...state,
-        ticker: "started"
+        pinging: true
       };
     case "PING_STOP":
       return {
         ...state,
-        ticker: "stopped"
+        pinging: false
       };
     case "ANIMATION": {
       return {
@@ -48,9 +44,6 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
-const mainMiddleware = createMainMiddleware({
-  // debug: true,
-  worker: slaveWorker
-});
+const mainMiddleware = createMainMiddleware({ worker: slaveWorker });
 
 export const store = createStore(reducer, applyMiddleware(mainMiddleware));

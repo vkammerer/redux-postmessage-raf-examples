@@ -1,7 +1,7 @@
 {
-  "name": "redux-postmessage-raf-react",
+  "name": "redux-postmessage-raf-examples",
   "version": "0.0.1",
-  "description": "An example architecture using web workers",
+  "description": "Experiments with redux-postmessage-raf and react, cyclejs, firebase etc",
   "scripts": {
     "clean": "find docs | grep '.*\\.js$' | xargs rm",
     "dev": "node_modules/.bin/webpack-dev-server --devtool cheap-module-source-map --content-base docs --watch-content-base",

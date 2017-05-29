@@ -1,23 +1,23 @@
 import React from "react";
 import { connect } from "react-redux";
 
-const FRAMES_TILL_FULL = 80;
-
 const Button = props => (
   <button
-    className={props.ticker === "started" ? "active" : ""}
-    onClick={() => props.dispatch(toggleTickerAction)}
+    className={props.pinging ? "active" : ""}
+    onClick={() => props.dispatch(toggleCircleAction)}
   >
-    {props.ticker === "stopped" ? "Start ticker" : "Stop ticker"}
+    {props.pinging ? "Stop pinging" : "Start pinging"}
   </button>
 );
 
-const ConnectedButton = connect(state => ({ ticker: state.ticker }))(Button);
+const ConnectedButton = connect(state => ({ pinging: state.pinging }))(Button);
 
-const toggleTickerAction = {
+const toggleCircleAction = {
   type: "PING_TOGGLE",
   meta: { toWorker: true }
 };
+
+const FRAMES_TILL_FULL = 80;
 
 const Animation = props => (
   <div className="animation">
@@ -34,15 +34,12 @@ const ConnectedAnimation = connect(state => ({ scale: state.scale }))(
   Animation
 );
 
-const Ticker = props => (
+const Circle = props => (
   <div>
-    <h3>Ticker</h3>
-    <p>
-      Send ping to web worker on every requestAnimationFrame.
-    </p>
+    <h3>Circle</h3>
     <ConnectedButton />
     <ConnectedAnimation />
   </div>
 );
 
-export default Ticker;
+export default Circle;
