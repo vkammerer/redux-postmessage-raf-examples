@@ -17,7 +17,7 @@ const Articles = props => (
     </button>
     <div className="output">
       <ul>
-        {props.articles.map(a => (
+        {props.articles.articles.map(a => (
           <li key={a.key}>{a.value.username} said: {a.value.content}</li>
         ))}
       </ul>

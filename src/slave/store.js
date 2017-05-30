@@ -1,28 +1,27 @@
-import { createStore, applyMiddleware } from "redux";
+import { combineReducers, createStore, applyMiddleware } from "redux";
+import { logger, createLogger } from "redux-logger";
 import { createCycleMiddleware } from "redux-cycles";
-import { createWorkerMiddleware } from "@vkammerer/redux-postmessage-raf";
-// import { createWorkerMiddleware } from "../../../redux-postmessage-raf";
+// import { createWorkerMiddleware } from "@vkammerer/redux-postmessage-raf";
+import { createWorkerMiddleware } from "../../../redux-postmessage-raf";
+import { messager } from "../common/reducers/messager";
+import { articles } from "../common/reducers/articles";
+import { name } from "../common/reducers/name";
 
-const defaultState = { ticking: false };
+const reducers = combineReducers({
+  messager,
+  name,
+  articles
+});
 
-const reducer = (state = defaultState, action) => {
-  switch (action.type) {
-    case "PING_TOGGLE":
-      return {
-        ...state,
-        ticking: !state.ticking
-      };
-    default:
-      return state;
-  }
-};
+// MIDDLEWARES
 
-const workerMiddleware = createWorkerMiddleware({});
+const messagerMiddleware = createWorkerMiddleware({ dispatchAfterPong: true });
 
 const cycleMiddleware = createCycleMiddleware();
 export const { makeActionDriver, makeStateDriver } = cycleMiddleware;
 
 export const store = createStore(
-  reducer,
-  applyMiddleware(workerMiddleware, cycleMiddleware)
+  reducers,
+  applyMiddleware(messagerMiddleware, cycleMiddleware)
+  // applyMiddleware(messagerMiddleware, cycleMiddleware, logger)
 );

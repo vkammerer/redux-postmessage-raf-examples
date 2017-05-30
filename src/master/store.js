@@ -1,49 +1,25 @@
-import { createStore, applyMiddleware } from "redux";
-import { createMainMiddleware } from "@vkammerer/redux-postmessage-raf";
-// import { createMainMiddleware } from "../../../redux-postmessage-raf";
+import { combineReducers, createStore, applyMiddleware } from "redux";
+import { logger, createLogger } from "redux-logger";
+// import { createMainMiddleware } from "@vkammerer/redux-postmessage-raf";
+import { createMainMiddleware } from "../../../redux-postmessage-raf";
 import { slaveWorker } from "./slaveWorker";
+import { messager } from "../common/reducers/messager";
+import { articles } from "../common/reducers/articles";
+import { name } from "../common/reducers/name";
+import { animation } from "./reducers/animation";
 
-const defaultState = {
-  pinging: false,
-  scale: 0,
-  name: "John",
-  articles: []
-};
+const reducers = combineReducers({
+  messager,
+  animation,
+  name,
+  articles
+});
 
-const reducer = (state = defaultState, action) => {
-  switch (action.type) {
-    case "PING_START":
-      return {
-        ...state,
-        pinging: true
-      };
-    case "PING_STOP":
-      return {
-        ...state,
-        pinging: false
-      };
-    case "ANIMATION": {
-      return {
-        ...state,
-        scale: action.payload
-      };
-    }
+// MIDDLEWARES
+const messagerMiddleware = createMainMiddleware(slaveWorker);
 
-    case "NAME_SET":
-      return {
-        ...state,
-        name: action.payload.name
-      };
-    case "ARTICLES_SET":
-      return {
-        ...state,
-        articles: action.payload.articles
-      };
-    default:
-      return state;
-  }
-};
-
-const mainMiddleware = createMainMiddleware({ worker: slaveWorker });
-
-export const store = createStore(reducer, applyMiddleware(mainMiddleware));
+export const store = createStore(
+  reducers,
+  applyMiddleware(messagerMiddleware)
+  // applyMiddleware(messagerMiddleware, logger)
+);

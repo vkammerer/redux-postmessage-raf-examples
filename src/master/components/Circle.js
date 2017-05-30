@@ -3,14 +3,16 @@ import { connect } from "react-redux";
 
 const Button = props => (
   <button
-    className={props.pinging ? "active" : ""}
+    className={props.messager.pinging ? "active" : ""}
     onClick={() => props.dispatch(toggleCircleAction)}
   >
-    {props.pinging ? "Stop pinging" : "Start pinging"}
+    {props.messager.pinging ? "Stop pinging" : "Start pinging"}
   </button>
 );
 
-const ConnectedButton = connect(state => ({ pinging: state.pinging }))(Button);
+const ConnectedButton = connect(state => ({ messager: state.messager }))(
+  Button
+);
 
 const toggleCircleAction = {
   type: "PING_TOGGLE",
@@ -24,13 +26,13 @@ const Animation = props => (
     <div
       className="animated"
       style={{
-        transform: `scale(${props.scale % FRAMES_TILL_FULL / FRAMES_TILL_FULL})`
+        transform: `scale(${props.animation.scale % FRAMES_TILL_FULL / FRAMES_TILL_FULL})`
       }}
     />
   </div>
 );
 
-const ConnectedAnimation = connect(state => ({ scale: state.scale }))(
+const ConnectedAnimation = connect(state => ({ animation: state.animation }))(
   Animation
 );
 

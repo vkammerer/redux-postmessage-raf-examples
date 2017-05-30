@@ -1,5 +1,6 @@
 import xs from "xstream";
 import sampleCombine from "xstream/extra/sampleCombine";
+import { firebaseActions } from "@joshforisha/cycle-firebase";
 import { objectPropsToArray } from "../common/utils";
 import concat from "xstream/extra/concat";
 
@@ -17,25 +18,17 @@ const delayedActions$ = xs.fromArray(
 const App = sources => {
   const state$ = sources.STATE;
   const action$ = sources.ACTION;
-  const firebase$ = sources.firebase;
+  // const firebase$ = sources.firebase;
 
   // TICKER
   const toggleAction$ = action$.filter(a => a.type === "PING_TOGGLE");
-  const isTicking$ = state$.map(state => state.ticking);
+  const isPinging$ = state$.map(state => state.messager.pinging);
   const toggleSink$ = toggleAction$
-    .compose(sampleCombine(isTicking$))
-    .map(([, isTicking]) =>
-      xs.fromArray([
-        {
-          type: !isTicking ? "PING_START" : "PING_STOP"
-        },
-        {
-          type: !isTicking ? "PING_START" : "PING_STOP",
-          meta: { toMain: true }
-        }
-      ])
-    )
-    .flatten();
+    .compose(sampleCombine(isPinging$))
+    .map(([, isPinging]) => ({
+      type: !isPinging ? "PING_START" : "PING_STOP",
+      meta: { toMain: true }
+    }));
 
   const pingAction$ = action$.filter(a => a.type === "PONG_AFTER");
   const animationAction$ = pingAction$.map(a => {
@@ -45,6 +38,7 @@ const App = sources => {
       payload: a.payload,
       meta: {
         toMain: true,
+        ignoreSelf: true,
         delay: { pingCount: a.payload + 1 }
       }
     };
@@ -67,9 +61,9 @@ const App = sources => {
 
   // ARTICLES
   const articlesAction$ = action$.filter(a => a.type === "ARTICLES_GET");
-  const articlesData$ = firebase$
-    .on("articles", "value")
-    .map(a => objectPropsToArray(a));
+  const articlesData$ = sources.firebase.database
+    .ref("articles")
+    .value.map(a => objectPropsToArray(a));
   const articlesSink$ = xs
     .combine(articlesData$, articlesAction$)
     .map(arr => arr[0])
