@@ -1,5 +1,5 @@
 const defaultState = {
-  name: "John"
+  name: ""
 };
 
 export const name = (state = defaultState, action) => {
@@ -7,7 +7,7 @@ export const name = (state = defaultState, action) => {
     case "NAME_SET":
       return {
         ...state,
-        name: action.payload.name
+        name: action.payload
       };
     default:
       return state;

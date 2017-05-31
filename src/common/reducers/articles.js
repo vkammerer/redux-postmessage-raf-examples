@@ -7,7 +7,7 @@ export const articles = (state = defaultState, action) => {
     case "ARTICLES_SET":
       return {
         ...state,
-        articles: action.payload.articles
+        articles: action.payload
       };
     default:
       return state;

@@ -3,14 +3,18 @@ import sampleCombine from "xstream/extra/sampleCombine";
 import { firebaseActions } from "@joshforisha/cycle-firebase";
 import { objectPropsToArray } from "../common/utils";
 import concat from "xstream/extra/concat";
+import dropUntil from "xstream/extra/dropUntil";
 
-const delayedActions$ = xs.fromArray(
+const FRAMES_TILL_FULL = 80;
+const getScale = pingCount => pingCount % FRAMES_TILL_FULL / FRAMES_TILL_FULL;
+
+const delayedActions = xs.fromArray(
   [...Array(1000).keys()].map((n, i) => ({
     type: "ANIMATION",
-    payload: i,
+    payload: getScale(i),
     meta: {
       toMain: true,
-      delay: { index: i }
+      delay: { index: i + 50 }
     }
   }))
 );
@@ -18,9 +22,8 @@ const delayedActions$ = xs.fromArray(
 const App = sources => {
   const state$ = sources.STATE;
   const action$ = sources.ACTION;
-  // const firebase$ = sources.firebase;
 
-  // TICKER
+  // PING START / STOP
   const toggleAction$ = action$.filter(a => a.type === "PING_TOGGLE");
   const isPinging$ = state$.map(state => state.messager.pinging);
   const toggleSink$ = toggleAction$
@@ -30,33 +33,37 @@ const App = sources => {
       meta: { toMain: true }
     }));
 
+  // ANIMATION
   const pingAction$ = action$.filter(a => a.type === "PONG_AFTER");
-  const animationAction$ = pingAction$.map(a => {
-    // console.log(a);
-    return {
-      type: "ANIMATION",
-      payload: a.payload,
-      meta: {
-        toMain: true,
-        ignoreSelf: true,
-        delay: { pingCount: a.payload + 1 }
-      }
-    };
-  });
 
-  // const pingAction$ = action$.filter(a => a.type === "PONG_AFTER");
-  // const pingCountIs10$ = pingAction$
-  //   .map(a => a.payload)
-  //   .filter(pingCount => pingCount === 10)
-  //   .take(1);
-  // const animationAction$ = concat(pingCountIs10$, delayedActions$).drop(1);
+  // const animationAction$ = pingAction$.map(a => ({
+  //   type: "ANIMATION",
+  //   payload: getScale(a.payload),
+  //   meta: {
+  //     toMain: true,
+  //     ignoreSelf: true,
+  //     delay: { pingCount: a.payload + 1 }
+  //   }
+  // }));
+
+  const animationAction$ = pingAction$
+    .map(a => a.payload)
+    .filter(pingCount => pingCount === 1)
+    .mapTo(delayedActions)
+    .flatten();
 
   // NAME
-  const nameAction$ = action$.filter(a => a.type === "NAME_GET");
-  const nameSink$ = nameAction$.mapTo({
-    type: "NAME_SET",
-    payload: { name: "Jack" },
-    meta: { toMain: true }
+  const nameSubmitAction$ = action$.filter(a => a.type === "NAME_SUBMIT");
+  const nameFirebaseAction$ = nameSubmitAction$
+    .map(a => a.payload)
+    .map(firebaseActions.database.ref("name").set);
+
+  const nameSink$ = sources.firebase.database.ref("name").value.map(v => {
+    return {
+      type: "NAME_SET",
+      payload: v,
+      meta: { toMain: true }
+    };
   });
 
   // ARTICLES
@@ -69,7 +76,7 @@ const App = sources => {
     .map(arr => arr[0])
     .map(articles => ({
       type: "ARTICLES_SET",
-      payload: { articles },
+      payload: articles,
       meta: { toMain: true }
     }));
 
@@ -80,7 +87,8 @@ const App = sources => {
     animationAction$
   );
   return {
-    ACTION: actionSink$
+    ACTION: actionSink$,
+    firebase: xs.merge(nameFirebaseAction$)
   };
 };
 

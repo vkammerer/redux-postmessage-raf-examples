@@ -4,17 +4,6 @@
   margin: 0;
 }
 
-#perf {
-  border: 1px solid black;
-  margin: 10px;
-  padding: 20px;
-}
-#root {
-  padding: 20px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
 h3 {
   margin-top: 20px;
 }
@@ -28,15 +17,32 @@ button {
   border: 1px solid #6995c3;
   border-radius: 3px;
 }
+
 button:focus {
   outline:0;
 }
+
 button.active {
   background: #ffb1b1;
   border: 1px solid #c36969;
 }
+
+input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  line-height: 200%;
+  padding: 4px;
+}
+
 ul {
   list-style-type: none;
+}
+
+#root {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .animation {
@@ -48,6 +54,7 @@ ul {
   overflow: hidden;
   border-radius: 50%;
 }
+
 .animated {
   position: absolute;
   border-radius: 50%;
@@ -63,13 +70,4 @@ ul {
   padding: 10px;
   background: #EEE;
   border: 1px solid #DDD;
-}
-
-.perfData {
-  border-left: 1px solid #CCC;
-}
-
-.perfD {
-  height: 1px;
-  background: blue;
 }

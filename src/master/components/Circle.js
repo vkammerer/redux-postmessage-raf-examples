@@ -19,14 +19,12 @@ const toggleCircleAction = {
   meta: { toWorker: true }
 };
 
-const FRAMES_TILL_FULL = 80;
-
 const Animation = props => (
   <div className="animation">
     <div
       className="animated"
       style={{
-        transform: `scale(${props.animation.scale % FRAMES_TILL_FULL / FRAMES_TILL_FULL})`
+        transform: `scale(${props.animation.scale})`
       }}
     />
   </div>
