@@ -1,6 +1,8 @@
 export const firebaseConfig = {
-  apiKey: "AIzaSyCHvJ-2m_Cn_JqUxXmwqvqy9b-6FbsYtEI",
-  authDomain: "brilliant-inferno-6675.firebaseapp.com",
-  databaseURL: "https://brilliant-inferno-6675.firebaseio.com",
-  storageBucket: "brilliant-inferno-6675.appspot.com"
+  apiKey: "AIzaSyCBIMlB5WlOTufqVo3tMwcJoAbNV76BVwc",
+  authDomain: "test-project-44341.firebaseapp.com",
+  databaseURL: "https://test-project-44341.firebaseio.com",
+  projectId: "test-project-44341",
+  storageBucket: "test-project-44341.appspot.com",
+  messagingSenderId: "386873385183"
 };
